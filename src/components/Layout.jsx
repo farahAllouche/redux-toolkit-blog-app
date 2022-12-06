@@ -7,7 +7,7 @@ export default function Layout() {
   return (
     <Flex className="App" minH="100vh" minW="100vw" flexDirection="column">
       <Header />
-      <Outlet flexGrow="1" />
+      <Outlet />
     </Flex>
   );
 }
