@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-import { useSelector, useDispatch } from "react-redux";
-import {
-  selectAllPosts,
-  getPostsStatus,
-  getPostsError,
-  fetchPosts,
-} from "./postSlice";
+import { useSelector } from "react-redux";
+import { selectAllPosts, getPostsStatus, getPostsError } from "./postSlice";
 
 import { CentralTheme } from "../../theme";
-import { Spinner } from "@chakra-ui/react";
-import { Box, Heading, HStack, Spacer } from "@chakra-ui/react";
+import { Box, Heading, HStack, Spacer, Flex, Spinner } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { IconButton } from "@chakra-ui/react";
 
@@ -18,22 +12,20 @@ import AddPost from "./AddPost";
 import PostExcerpt from "./PostExcerpt";
 
 export const PostsList = () => {
-  const dispatch = useDispatch();
-
   const posts = useSelector(selectAllPosts);
   const postsError = useSelector(getPostsError);
   const postsStatus = useSelector(getPostsStatus);
-
-  useEffect(() => {
-    if (postsStatus == "idle") dispatch(fetchPosts());
-  }, [postsStatus, dispatch]);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const { lines } = CentralTheme();
 
   let content;
   if (postsStatus === "loading") {
-    content = <Spinner size="xl" />;
+    content = (
+      <Flex align="center" justify="center" mt={4}>
+        <Spinner size="xl" thickness="4px" speed="0.65s" />
+      </Flex>
+    );
   } else if (postsStatus === "succeeded") {
     const orderedPosts = posts
       .slice()
@@ -47,10 +39,10 @@ export const PostsList = () => {
   }
 
   return (
-    <>
+    <Flex as="main" justifyContent="center" flexGrow="1">
       <Box
         w={500}
-        mx="300px"
+        minH=""
         display="flex"
         flexDirection="column"
         borderX="1px"
@@ -70,6 +62,6 @@ export const PostsList = () => {
         {content}
       </Box>
       {showAddForm && <AddPost setShowAddForm={setShowAddForm} />}
-    </>
+    </Flex>
   );
 };

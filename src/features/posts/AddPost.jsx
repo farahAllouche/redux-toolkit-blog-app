@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addPost } from "./postSlice";
+import { addNewPost } from "./postSlice";
 import { selectAllUsers } from "../users/usersSlice";
 import {
   FormControl,
@@ -23,6 +23,7 @@ function AddPost({ setShowAddForm }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [user, setUser] = useState({});
+  const [addRequestStatus, setAddRequestStatus] = useState("idle");
 
   const { bg, lines } = CentralTheme();
 
@@ -34,14 +35,29 @@ function AddPost({ setShowAddForm }) {
   const onContentChanged = (e) => setContent(e.target.value);
   const onAuthorChanged = (e) => setUser(e);
 
+  const canSave =
+    [title, content, user.value].every(Boolean) && addRequestStatus === "idle";
+
   const onFormSubmited = (e) => {
     e.preventDefault();
-    if (title && content) {
-      dispatch(addPost(title, content, user.value));
+
+    if (canSave) {
+      try {
+        setAddRequestStatus("pending");
+        dispatch(
+          addNewPost({ title, body: content, userId: user.value })
+        ).unwrap();
+
+        setTitle("");
+        setContent("");
+        setUser("");
+        setShowAddForm(false);
+      } catch (err) {
+        console.error("Failed to save the post", err);
+      } finally {
+        setAddRequestStatus("idle");
+      }
     }
-    setTitle("");
-    setContent("");
-    setShowAddForm(false);
   };
 
   const userOptions = users.map((user) => ({
